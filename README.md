@@ -5,8 +5,8 @@ armory-x11
 ===
 Simple SSH/X11-connectable docker container that uses:
 
- * Ubuntu Core 14.04
- * Bitcoin 0.12.1
+ * Ubuntu Core 16.04
+ * Bitcoin 0.13.0
  * Armory 0.94.1
 
 *YOU SHOULD STILL SIGN ON AN OFFLINE MACHINE, USE THIS ONLY FOR YOUR WATCH-ONLY WALLET!!*
