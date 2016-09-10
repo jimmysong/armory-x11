@@ -11,24 +11,28 @@ Simple SSH/X11-connectable docker container that uses:
 
 *YOU SHOULD STILL SIGN ON AN OFFLINE MACHINE, USE THIS ONLY FOR YOUR WATCH-ONLY WALLET!!*
 
-Build
------
-Include authorized_keys for access to this machine via SSH.
-
 Usage
 -----
 You can build with
 
-    (host) $ docker build -t armory-x11 .
+    (host) $ docker build -t jimmysong76/armory-x11 .
+
+or download with
+
+    (host) $ docker pull jimmysong76/armory-x11
 
 Create and start with
 
     (host) $ id
     uid=XXXX(YYYY) gid=ZZZZ(YYYY)
-    (host) $ docker create --name=armory -p 2222:22 -v <bitcoin dir>:/bitcoin -v <armory dir>:/armory -e PUID=XXXX -e PGID=ZZZZ armory-x11
+    (host) $ docker create --name=armory -p 2222:22 -v <bitcoin dir>:/bitcoin -v <armory dir>:/armory -e PUID=XXXX -e PGID=ZZZZ jimmysong76/armory-x11
     (host) $ docker start armory
 
-You can connect to the ssh server:
+At this point, add authorized keys to the image
+
+    (host) $ docker cp path/to/authorized_keys armory:/root/.ssh
+
+Now you can connect to the ssh server:
 
     $ ssh root@<SERVER_NAME> -p 2222
     Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 3.13.0-24-generic x86_64)
@@ -38,6 +42,10 @@ You can connect to the ssh server:
      * Support:        https://ubuntu.com/advantage
     $ armory
 
+In order to see armory, you're going to need an X11 server. Some popular ones:
+
+ * Windows: vcXsrv - https://sourceforge.net/projects/vcxsrv/
+ * Mac: XQuartz - https://www.xquartz.org/
 
 Credit
 ------

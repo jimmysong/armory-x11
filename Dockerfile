@@ -13,8 +13,8 @@ RUN curl -SLO "https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-$
  && curl -SLO "https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}/SHA256SUMS.asc"
 
 # Verify and install download
-ENV BITCOIN_KEY_FINGERPRINT 90C8019E36C2E964
-RUN gpg --keyserver pgp.mit.edu --recv-keys $BITCOIN_KEY_FINGERPRINT \
+COPY laanwj-releases.asc /bitcoin
+RUN gpg --import laanwj-releases.asc \
  && gpg --verify --trust-model=always SHA256SUMS.asc \
  && gpg --decrypt --output SHA256SUMS SHA256SUMS.asc \
  && grep "bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz" SHA256SUMS | sha256sum -c - \
@@ -31,8 +31,8 @@ RUN curl -SLO "https://github.com/goatpig/BitcoinArmory/releases/download/v${ARM
 RUN curl -SLO "https://github.com/goatpig/BitcoinArmory/releases/download/v${ARMORY_VERSION}/sha256sum.asc.txt"
 
 # Verify and install download
-ENV ARMORY_KEY_FINGERPRINT 8C5211764922589A
-RUN gpg --keyserver pgp.mit.edu --recv-keys $ARMORY_KEY_FINGERPRINT \
+COPY goatpig-signing-key.asc /armory
+RUN gpg --import goatpig-signing-key.asc \
  && gpg --verify --trust-model=always sha256sum.asc.txt \
  && gpg --decrypt --output sha256sum.txt sha256sum.asc.txt \
  && grep "armory_${ARMORY_VERSION}_amd64.deb" sha256sum.txt | sha256sum -c - \
@@ -41,14 +41,13 @@ RUN gpg --keyserver pgp.mit.edu --recv-keys $ARMORY_KEY_FINGERPRINT \
 
 RUN ln -s /armory /root/.armory
 RUN mkdir /root/.ssh \
- && chmod 700 /root/.ssh
-COPY authorized_keys /root/.ssh
-RUN chmod 700 /root/.ssh/authorized_keys
-
-RUN mkdir /var/run/sshd
+ && chmod 700 /root/.ssh \
+ && mkdir /var/run/sshd \
+ && perl -p -i -e "s/\#PasswordAuthentication yes/PasswordAuthentication no/" /etc/ssh/sshd_config
 
 # Expose SSH port for X11 forwarding
 ENV DISPLAY :0
 EXPOSE 22
 
-CMD ["/usr/sbin/sshd", "-D"]
+COPY run.sh /opt
+CMD ["/opt/run.sh"]
